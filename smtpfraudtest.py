@@ -40,6 +40,9 @@ def parse_args():
     parser.add_argument("-S", "--subject", type=str, default="smtptest",
             help="Mail subject"
             )
+    parser.add_argument("-a", "--addheader", type=str, default=[], action="append",
+            help="Add arbitrary text to header part of message (use this to add header)"
+            )
 
     global args
     args = parser.parse_args()
@@ -91,8 +94,10 @@ if __name__ == '__main__':
         smtp.expect('\n354')
         smtp.sendline("Subject: %s" % (args.subject))
         smtp.sendline("From: %s" % (args.headerfrom))
+        for header in args.addheader:
+            smtp.sendline(header)
         smtp.sendline("")
-        smtp.sendline("This is a test message with subject %s, sent with mail from='%s' and header from='%s'" % (args.subject, args.sender, args.recipient))
+        smtp.sendline("This is a test message with subject %s, sent with mail from='%s' and header from='%s', and additional headers=%s" % (args.subject, args.sender, args.recipient, args.addheader))
         smtp.sendline(".")
         smtp.expect('\n250')
         smtp.sendline("QUIT")
