@@ -37,6 +37,9 @@ def parse_args():
     parser.add_argument("-f", "--headerfrom", type=str,
             help="Sender address to use in mail header (default is the same as -s)"
             )
+    parser.add_argument("-F", "--omitfrom", type=str, action='store_true', default=False,
+            help="Do not add 'From:' header to message"
+            )
     parser.add_argument("-S", "--subject", type=str, default="smtptest",
             help="Mail subject"
             )
@@ -93,7 +96,8 @@ if __name__ == '__main__':
         smtp.sendline("DATA")
         smtp.expect('\n354')
         smtp.sendline("Subject: %s" % (args.subject))
-        smtp.sendline("From: %s" % (args.headerfrom))
+        if not args.omitfrom:
+            smtp.sendline("From: %s" % (args.headerfrom))
         for header in args.addheader:
             smtp.sendline(header)
         smtp.sendline("")
